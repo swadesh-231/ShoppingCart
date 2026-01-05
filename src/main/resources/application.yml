@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ShoppingCart
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/ShopCart
+    username: postgres
+    password: 456784
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+#server:
+#  servlet:
+#    context-path: /api/v1
