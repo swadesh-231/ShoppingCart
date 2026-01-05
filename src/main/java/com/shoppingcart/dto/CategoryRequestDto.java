@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CategoryDto {
+public class CategoryRequestDto {
     private Long categoryId;
 
     @NotBlank(message = "Category name must not be blank")

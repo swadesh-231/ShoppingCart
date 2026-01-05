@@ -1,7 +1,7 @@
 package com.shoppingcart.service.impl;
 
-import com.shoppingcart.dto.CategoryDto;
-import com.shoppingcart.dto.CategoryResponse;
+import com.shoppingcart.dto.CategoryRequestDto;
+import com.shoppingcart.dto.CategoryResponseDto;
 import com.shoppingcart.entity.Category;
 import com.shoppingcart.exception.APIException;
 import com.shoppingcart.exception.ResourceNotFoundException;
@@ -24,7 +24,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final ModelMapper modelMapper;
 
     @Override
-    public CategoryResponse getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
+    public CategoryResponseDto getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
         if (pageNumber < 0) {throw new APIException("Page number cannot be negative");}
         if (pageSize <= 0) {throw new APIException("Page size must be greater than zero");}
 
@@ -33,11 +33,11 @@ public class CategoryServiceImpl implements CategoryService {
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<Category> categoryPage = categoryRepository.findAll(pageable);
-        List<CategoryDto> content = categoryPage.getContent()
+        List<CategoryRequestDto> content = categoryPage.getContent()
                 .stream()
-                .map(category -> modelMapper.map(category, CategoryDto.class))
+                .map(category -> modelMapper.map(category, CategoryRequestDto.class))
                 .toList();
-        return CategoryResponse.builder()
+        return CategoryResponseDto.builder()
                 .content(content)
                 .pageNumber(categoryPage.getNumber())
                 .pageSize(categoryPage.getSize())
@@ -47,35 +47,35 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
     }
     @Override
-    public CategoryDto createCategory(CategoryDto categoryDto) {
-        if (categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
+    public CategoryRequestDto createCategory(CategoryRequestDto categoryRequestDto) {
+        if (categoryRepository.existsByCategoryName(categoryRequestDto.getCategoryName())) {
+            throw new APIException("Category with name '" + categoryRequestDto.getCategoryName() + "' already exists");
         }
         Category category = Category.builder()
-                .categoryName(categoryDto.getCategoryName())
+                .categoryName(categoryRequestDto.getCategoryName())
                 .build();
         Category savedCategory = categoryRepository.save(category);
-        return modelMapper.map(savedCategory, CategoryDto.class);
+        return modelMapper.map(savedCategory, CategoryRequestDto.class);
     }
 
     @Override
-    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
+    public CategoryRequestDto updateCategory(Long categoryId, CategoryRequestDto categoryRequestDto) {
         Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        if (!existingCategory.getCategoryName().equals(categoryDto.getCategoryName())
-                && categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
+        if (!existingCategory.getCategoryName().equals(categoryRequestDto.getCategoryName())
+                && categoryRepository.existsByCategoryName(categoryRequestDto.getCategoryName())) {
+            throw new APIException("Category with name '" + categoryRequestDto.getCategoryName() + "' already exists");
         }
-        existingCategory.setCategoryName(categoryDto.getCategoryName());
+        existingCategory.setCategoryName(categoryRequestDto.getCategoryName());
         Category updatedCategory = categoryRepository.save(existingCategory);
-        return modelMapper.map(updatedCategory, CategoryDto.class);
+        return modelMapper.map(updatedCategory, CategoryRequestDto.class);
     }
 
     @Override
-    public CategoryDto deleteCategory(Long categoryId) {
+    public CategoryRequestDto deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         categoryRepository.delete(category);
-        return modelMapper.map(category, CategoryDto.class);
+        return modelMapper.map(category, CategoryRequestDto.class);
     }
 }

@@ -11,8 +11,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CategoryResponse {
-    private List<CategoryDto> content;
+public class CategoryResponseDto {
+    private List<CategoryRequestDto> content;
     Integer pageNumber;
     Integer pageSize;
     Long totalElements;
