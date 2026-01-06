@@ -1,10 +1,12 @@
 package com.shoppingcart.exception;
 
-public class APIException extends RuntimeException{
+public class APIException extends RuntimeException {
+
     public APIException(String message) {
         super(message);
     }
-    public APIException() {
-    }
 
+    public APIException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

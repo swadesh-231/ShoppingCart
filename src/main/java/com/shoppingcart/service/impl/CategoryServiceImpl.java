@@ -3,7 +3,8 @@ package com.shoppingcart.service.impl;
 import com.shoppingcart.dto.CategoryDto;
 import com.shoppingcart.dto.CategoryResponseDto;
 import com.shoppingcart.entity.Category;
-import com.shoppingcart.exception.APIException;
+import com.shoppingcart.exception.BadRequestException;
+import com.shoppingcart.exception.DuplicateResourceException;
 import com.shoppingcart.exception.ResourceNotFoundException;
 import com.shoppingcart.repository.CategoryRepository;
 import com.shoppingcart.service.CategoryService;
@@ -25,8 +26,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponseDto getAllCategories(Integer pageNumber, Integer pageSize, String sortBy, String sortOrder) {
-        if (pageNumber < 0) {throw new APIException("Page number cannot be negative");}
-        if (pageSize <= 0) {throw new APIException("Page size must be greater than zero");}
+        if (pageNumber < 0) {
+            throw new BadRequestException("Page number cannot be negative");
+        }
+        if (pageSize <= 0) {
+            throw new BadRequestException("Page size must be greater than zero");
+        }
 
         Sort sort = sortOrder.equalsIgnoreCase("asc")
                 ? Sort.by(sortBy).ascending()
@@ -46,13 +51,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .lastPage(categoryPage.isLast())
                 .build();
     }
+
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
-        if (categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
+        String categoryName = categoryDto.getCategoryName().trim();
+        if (categoryRepository.existsByCategoryName(categoryName)) {
+            throw new DuplicateResourceException("Category already exists");
         }
         Category category = Category.builder()
-                .categoryName(categoryDto.getCategoryName())
+                .categoryName(categoryName)
                 .build();
         Category savedCategory = categoryRepository.save(category);
         return modelMapper.map(savedCategory, CategoryDto.class);
@@ -62,11 +69,13 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
         Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        if (!existingCategory.getCategoryName().equals(categoryDto.getCategoryName())
-                && categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
+
+        String newName = categoryDto.getCategoryName().trim();
+        if (!existingCategory.getCategoryName().equals(newName)
+                && categoryRepository.existsByCategoryName(newName)) {
+            throw new DuplicateResourceException("Category already exists");
         }
-        existingCategory.setCategoryName(categoryDto.getCategoryName());
+        existingCategory.setCategoryName(newName);
         Category updatedCategory = categoryRepository.save(existingCategory);
         return modelMapper.map(updatedCategory, CategoryDto.class);
     }
