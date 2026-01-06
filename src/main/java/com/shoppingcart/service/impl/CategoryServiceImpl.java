@@ -1,6 +1,6 @@
 package com.shoppingcart.service.impl;
 
-import com.shoppingcart.dto.CategoryRequestDto;
+import com.shoppingcart.dto.CategoryDto;
 import com.shoppingcart.dto.CategoryResponseDto;
 import com.shoppingcart.entity.Category;
 import com.shoppingcart.exception.APIException;
@@ -33,9 +33,9 @@ public class CategoryServiceImpl implements CategoryService {
                 : Sort.by(sortBy).descending();
         Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
         Page<Category> categoryPage = categoryRepository.findAll(pageable);
-        List<CategoryRequestDto> content = categoryPage.getContent()
+        List<CategoryDto> content = categoryPage.getContent()
                 .stream()
-                .map(category -> modelMapper.map(category, CategoryRequestDto.class))
+                .map(category -> modelMapper.map(category, CategoryDto.class))
                 .toList();
         return CategoryResponseDto.builder()
                 .content(content)
@@ -47,35 +47,35 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
     }
     @Override
-    public CategoryRequestDto createCategory(CategoryRequestDto categoryRequestDto) {
-        if (categoryRepository.existsByCategoryName(categoryRequestDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryRequestDto.getCategoryName() + "' already exists");
+    public CategoryDto createCategory(CategoryDto categoryDto) {
+        if (categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
+            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
         }
         Category category = Category.builder()
-                .categoryName(categoryRequestDto.getCategoryName())
+                .categoryName(categoryDto.getCategoryName())
                 .build();
         Category savedCategory = categoryRepository.save(category);
-        return modelMapper.map(savedCategory, CategoryRequestDto.class);
+        return modelMapper.map(savedCategory, CategoryDto.class);
     }
 
     @Override
-    public CategoryRequestDto updateCategory(Long categoryId, CategoryRequestDto categoryRequestDto) {
+    public CategoryDto updateCategory(Long categoryId, CategoryDto categoryDto) {
         Category existingCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
-        if (!existingCategory.getCategoryName().equals(categoryRequestDto.getCategoryName())
-                && categoryRepository.existsByCategoryName(categoryRequestDto.getCategoryName())) {
-            throw new APIException("Category with name '" + categoryRequestDto.getCategoryName() + "' already exists");
+        if (!existingCategory.getCategoryName().equals(categoryDto.getCategoryName())
+                && categoryRepository.existsByCategoryName(categoryDto.getCategoryName())) {
+            throw new APIException("Category with name '" + categoryDto.getCategoryName() + "' already exists");
         }
-        existingCategory.setCategoryName(categoryRequestDto.getCategoryName());
+        existingCategory.setCategoryName(categoryDto.getCategoryName());
         Category updatedCategory = categoryRepository.save(existingCategory);
-        return modelMapper.map(updatedCategory, CategoryRequestDto.class);
+        return modelMapper.map(updatedCategory, CategoryDto.class);
     }
 
     @Override
-    public CategoryRequestDto deleteCategory(Long categoryId) {
+    public CategoryDto deleteCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "categoryId", categoryId));
         categoryRepository.delete(category);
-        return modelMapper.map(category, CategoryRequestDto.class);
+        return modelMapper.map(category, CategoryDto.class);
     }
 }

@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,9 +32,9 @@ public class Product {
     @Size(min = 6, message = "Product description must contain at least 6 characters")
     private String description;
     private Integer quantity;
-    private double price;
-    private double discount;
-    private double specialPrice;
+    private BigDecimal price;
+    private BigDecimal discount;
+    private BigDecimal specialPrice;
 
     @ManyToOne
     @JoinColumn(name = "categoryId")

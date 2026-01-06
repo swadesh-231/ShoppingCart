@@ -1,7 +1,7 @@
 package com.shoppingcart.controller;
 
 import com.shoppingcart.config.AppConstants;
-import com.shoppingcart.dto.CategoryRequestDto;
+import com.shoppingcart.dto.CategoryDto;
 import com.shoppingcart.dto.CategoryResponseDto;
 import com.shoppingcart.service.CategoryService;
 import jakarta.validation.Valid;
@@ -26,22 +26,22 @@ public class CategoryController {
     }
 
     @PostMapping("/admin/categories")
-    public ResponseEntity<CategoryRequestDto> addCategory(@Valid @RequestBody CategoryRequestDto categoryRequestDto) {
-        CategoryRequestDto createdCategory = categoryService.createCategory(categoryRequestDto);
+    public ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody CategoryDto categoryDto) {
+        CategoryDto createdCategory = categoryService.createCategory(categoryDto);
         return ResponseEntity.ok(createdCategory);
     }
 
     @DeleteMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryRequestDto> deleteCategory(@PathVariable Long categoryId) {
-        CategoryRequestDto deletedCategory = categoryService.deleteCategory(categoryId);
+    public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Long categoryId) {
+        CategoryDto deletedCategory = categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok(deletedCategory);
     }
 
     @PutMapping("/admin/categories/{categoryId}")
-    public ResponseEntity<CategoryRequestDto> updateCategory(
-            @Valid @RequestBody CategoryRequestDto categoryRequestDto,
+    public ResponseEntity<CategoryDto> updateCategory(
+            @Valid @RequestBody CategoryDto categoryDto,
             @PathVariable Long categoryId) {
-        CategoryRequestDto updatedCategory = categoryService.updateCategory(categoryId, categoryRequestDto);
+        CategoryDto updatedCategory = categoryService.updateCategory(categoryId, categoryDto);
         return ResponseEntity.ok(updatedCategory);
     }
 }

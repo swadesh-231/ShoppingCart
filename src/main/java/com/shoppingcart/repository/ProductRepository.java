@@ -1,9 +1,15 @@
 package com.shoppingcart.repository;
 
+import com.shoppingcart.entity.Category;
 import com.shoppingcart.entity.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
+import org.springframework.data.jpa.repository.Query;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    Boolean existsByCategory_CategoryIdAndProductName(Long category_categoryId, String productName);
+    Boolean existsByCategoryAndProductName(Category category, String productName);
+    Page<Product> findByCategoryOrderByPriceAsc(Category category, Pageable pageDetails);
+    @Query("SELECT p FROM Product p WHERE LOWER(p.productName) LIKE LOWER(CONCAT('%', :keyword, '%'))")
+    Page<Product> findByProductNameContainingIgnoreCase(String keyword, Pageable pageable);
 }
