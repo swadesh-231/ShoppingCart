@@ -51,7 +51,6 @@ public class CategoryServiceImpl implements CategoryService {
                 .lastPage(categoryPage.isLast())
                 .build();
     }
-
     @Override
     public CategoryDto createCategory(CategoryDto categoryDto) {
         String categoryName = categoryDto.getCategoryName().trim();
