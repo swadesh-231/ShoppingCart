@@ -12,12 +12,19 @@ import com.shoppingcart.repository.ProductRepository;
 import com.shoppingcart.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -28,6 +35,9 @@ public class ProductServiceImpl implements ProductService {
         private final CategoryRepository categoryRepository;
         private final ProductRepository productRepository;
         private final ModelMapper modelMapper;
+        private final S3Client s3Client;
+        @Value("${aws.s3.bucketname}")
+        private String bucketName;
 
         @Override
         public ProductDto addProduct(Long categoryId, ProductDto productDto) {
@@ -154,6 +164,37 @@ public class ProductServiceImpl implements ProductService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
                 productRepository.delete(product);
                 return modelMapper.map(product, ProductDto.class);
+        }
+
+        @Override
+        public ProductDto updateProductImage(Long productId, MultipartFile image) throws IOException {
+                Product product = productRepository.findById(productId)
+                                .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
+
+                // Generate unique S3 key for the image
+                String originalFilename = image.getOriginalFilename();
+                String extension = originalFilename != null && originalFilename.contains(".")
+                                ? originalFilename.substring(originalFilename.lastIndexOf("."))
+                                : "";
+                String s3Key = "products/" + productId + "_" + System.currentTimeMillis() + extension;
+
+                // Upload image to S3 with public-read ACL
+                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                                .bucket(bucketName)
+                                .key(s3Key)
+                                .contentType(image.getContentType())
+                                .acl(ObjectCannedACL.PUBLIC_READ)
+                                .build();
+
+                s3Client.putObject(putObjectRequest,
+                                RequestBody.fromInputStream(image.getInputStream(), image.getSize()));
+
+                // Update product with image URL
+                String imageUrl = "https://" + bucketName + ".s3.amazonaws.com/" + s3Key;
+                product.setImage(imageUrl);
+
+                Product savedProduct = productRepository.save(product);
+                return modelMapper.map(savedProduct, ProductDto.class);
         }
 
         private BigDecimal calculateSpecialPrice(BigDecimal price, BigDecimal discount) {

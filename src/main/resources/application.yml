@@ -1,16 +1,25 @@
 spring:
   application:
-    name: ShoppingCart
+    name: ${SPRING_APPLICATION_NAME}
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ShopCart
-    username: postgres
-    password: 456784
+    url: ${DATASOURCE_URL}
+    username: ${USERNAME}
+    password: ${PASSWORD}
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: ${HIBERNATE_DDL_AUTO}
 
-#server:
-#  servlet:
-#    context-path: /api/v1
+project:
+  image: {PROJECT_IMAGE}
+
+
+aws:
+  access:
+    key: ${AWS_ACCESS_KEY}
+  secret:
+    key: ${AWS_SECRET_KEY}
+  region: ${AWS_REGION}
+  s3:
+    bucketname: ${AWS_BUCKET_NAME}

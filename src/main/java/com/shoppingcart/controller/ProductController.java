@@ -6,8 +6,12 @@ import com.shoppingcart.dto.ProductResponseDto;
 import com.shoppingcart.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -61,6 +65,11 @@ public class ProductController {
     public ResponseEntity<ProductDto> deleteProduct(@PathVariable Long productId){
         ProductDto deletedProduct = productService.deleteProduct(productId);
         return ResponseEntity.ok(deletedProduct);
+    }
+    @PutMapping("/products/{productId}/image")
+    public ResponseEntity<ProductDto> updateProductImage(@PathVariable Long productId,@RequestParam("image") MultipartFile image) throws IOException {
+        ProductDto updatedProduct = productService.updateProductImage(productId, image);
+        return ResponseEntity.ok(updatedProduct);
     }
 
 }
