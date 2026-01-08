@@ -1,4 +1,4 @@
-package com.shoppingcart.exception;
+package com.shoppingcart.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
