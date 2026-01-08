@@ -108,16 +108,43 @@ The API will be available at `http://localhost:8080`
 | `DELETE` | `/api/v1/admin/products/{id}` | Delete a product | Admin |
 | `PUT` | `/api/v1/products/{id}/image` | Upload product image | - |
 
-### Query Parameters
+### 📄 Pagination & Sorting
 
-All list endpoints support the following query parameters:
+All list endpoints support pagination and sorting through query parameters.
 
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `pageNumber` | 0 | Page number (0-indexed) |
-| `pageSize` | 10 | Items per page |
-| `sortBy` | varies | Field to sort by |
-| `sortOrder` | asc | Sort direction (`asc` / `desc`) |
+#### Common Parameters
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `pageNumber` | Integer | `0` | Page number (0-indexed) |
+| `pageSize` | Integer | `10` | Number of items per page |
+| `sortOrder` | String | `asc` | Sort direction: `asc` or `desc` |
+
+#### Sort Fields by Resource
+
+| Resource | Parameter | Default `sortBy` | Available Fields |
+|----------|-----------|------------------|------------------|
+| Categories | `sortBy` | `categoryId` | `categoryId`, `categoryName` |
+| Products | `sortBy` | `productId` | `productId`, `productName`, `price`, `quantity` |
+
+#### Example Request
+
+```http
+GET /api/v1/public/products?pageNumber=0&pageSize=5&sortBy=price&sortOrder=desc
+```
+
+#### Paginated Response Structure
+
+```json
+{
+  "contents": [...],
+  "pageNumber": 0,
+  "pageSize": 5,
+  "totalElements": 50,
+  "totalPages": 10,
+  "last": false
+}
+```
 
 ---
 
