@@ -148,7 +148,7 @@ public class ProductServiceImpl implements ProductService {
                                 .orElseThrow(() -> new ResourceNotFoundException("Product", "productId", productId));
 
                 existingProduct.setProductName(productDto.getProductName().trim());
-                existingProduct.setDescription(productDto.getProductDescription());
+                existingProduct.setDescription(productDto.getDescription());
                 existingProduct.setQuantity(productDto.getQuantity());
                 existingProduct.setDiscount(productDto.getDiscount());
                 existingProduct.setPrice(productDto.getPrice());
