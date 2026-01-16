@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/public/categories")
+    @GetMapping("/categories")
     public ResponseEntity<CategoryResponseDto> getAllCategories(
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -28,22 +27,19 @@ public class CategoryController {
         return ResponseEntity.ok(categoryResponseDto);
     }
 
-    @PostMapping("/admin/categories")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/categories")
     public ResponseEntity<CategoryDto> addCategory(@Valid @RequestBody CategoryDto categoryDto) {
         CategoryDto createdCategory = categoryService.createCategory(categoryDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdCategory);
     }
 
-    @DeleteMapping("/admin/categories/{categoryId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDto> deleteCategory(@PathVariable Long categoryId) {
         CategoryDto deletedCategory = categoryService.deleteCategory(categoryId);
         return ResponseEntity.ok(deletedCategory);
     }
 
-    @PutMapping("/admin/categories/{categoryId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/categories/{categoryId}")
     public ResponseEntity<CategoryDto> updateCategory(
             @Valid @RequestBody CategoryDto categoryDto,
             @PathVariable Long categoryId) {

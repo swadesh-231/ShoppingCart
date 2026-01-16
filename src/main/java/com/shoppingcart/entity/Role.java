@@ -23,7 +23,6 @@ public class Role {
     @Column(name = "role_name", nullable = false, unique = true, length = 50)
     private UserRoles roleName;
 
-    // Bidirectional relationship - inverse side
     @ManyToMany(mappedBy = "roles", fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

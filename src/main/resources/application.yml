@@ -24,7 +24,7 @@ aws:
   s3:
     bucketname: ${AWS_BUCKET_NAME}
 
-app:
-  jwt:
-    secret: ${JWT_SECRET}
-    expiration-ms: ${JWT_TIME}
+#app:
+#  jwt:
+#    secret: ${JWT_SECRET}
+#    expiration-ms: ${JWT_TIME}

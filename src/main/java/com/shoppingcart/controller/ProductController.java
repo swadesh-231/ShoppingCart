@@ -8,7 +8,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,16 +19,15 @@ import java.io.IOException;
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping("/admin/categories/{categoryId}/product")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @PostMapping("/categories/{categoryId}/product")
     public ResponseEntity<ProductDto> addProduct(
             @PathVariable Long categoryId,
             @Valid @RequestBody ProductDto productDto) {
         ProductDto savedProductDTO = productService.addProduct(categoryId, productDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedProductDTO);
+        return ResponseEntity.ok().body(savedProductDTO);
     }
 
-    @GetMapping("/public/products")
+    @GetMapping("/products")
     public ResponseEntity<ProductResponseDto> getAllProducts(
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
             @RequestParam(name = "pageSize", defaultValue = AppConstants.PAGE_SIZE, required = false) Integer pageSize,
@@ -39,7 +37,7 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    @GetMapping("/public/categories/{categoryId}/products")
+    @GetMapping("/categories/{categoryId}/products")
     public ResponseEntity<ProductResponseDto> getProductsByCategory(
             @PathVariable Long categoryId,
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -51,7 +49,7 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    @GetMapping("/public/products/keyword/{keyword}")
+    @GetMapping("/products/keyword/{keyword}")
     public ResponseEntity<ProductResponseDto> getProductsByKeyword(
             @PathVariable String keyword,
             @RequestParam(name = "pageNumber", defaultValue = AppConstants.PAGE_NUMBER, required = false) Integer pageNumber,
@@ -63,8 +61,7 @@ public class ProductController {
         return ResponseEntity.ok(productResponse);
     }
 
-    @PutMapping("/admin/products/{productId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    @PutMapping("/products/{productId}")
     public ResponseEntity<ProductDto> updateProduct(
             @Valid @RequestBody ProductDto productDto,
             @PathVariable Long productId) {
@@ -72,15 +69,13 @@ public class ProductController {
         return ResponseEntity.ok(updatedProductDTO);
     }
 
-    @DeleteMapping("/admin/products/{productId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/products/{productId}")
     public ResponseEntity<ProductDto> deleteProduct(@PathVariable Long productId) {
         ProductDto deletedProduct = productService.deleteProduct(productId);
         return ResponseEntity.ok(deletedProduct);
     }
 
     @PutMapping("/products/{productId}/image")
-    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<ProductDto> updateProductImage(
             @PathVariable Long productId,
             @RequestParam("image") MultipartFile image) throws IOException {
